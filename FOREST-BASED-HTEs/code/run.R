@@ -80,6 +80,7 @@ run <- function(
   y.hat <- NULL
   fixed <- NULL
   nm <- nmt <- "trt1"
+  cfVarImp <- NULL
 
   ### replace treatment indicator by in randomized trial
   W.hat <- if (identical(unique(predict(d, newdata = d)[, "pfct"]), .5)) .5 else NULL
@@ -104,7 +105,7 @@ run <- function(
       mtry = mtry,
       num.trees = NumTrees, honesty = honesty, num.threads = 32L)
   }
-
+  if (causal_forest) cfVarImp <- variable_importance(cf)
   if (propensities & !causal_forest) {
     ### use W.hat of causal forest to center trt
     W.hat <- myW.hat
@@ -160,7 +161,8 @@ run <- function(
     ret <- c(cf)
   }
   mse <- mean((tau[, "tfct"] - ret)^2)
-  return(mse)
+  return(list(mse = mse,varimp = cfVarImp))
+  
 }
 
 coef.nomu <- function(object, ...) {
