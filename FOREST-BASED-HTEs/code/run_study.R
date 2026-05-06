@@ -104,7 +104,6 @@ unwrap(getJobPars(reg = reg))
 #-----
 # 7) submit jobs
 #----
-
 #testJob(1, reg = reg)
 
 submitJobs()
@@ -114,26 +113,25 @@ waitForJobs()
 # 8) Save results as rds
 #----
 
-#print(reduceResultsDataTable(fun = function(x) list(res = x)))
-
 res <- ijoin(
   getJobPars(),
   reduceResultsDataTable(fun = function(x) list(res = x))
 )
+
+res$result <- lapply(res$result, function(rr) {
+   unlist(rr)
+  })
+  
 res <- unwrap(res, sep = ".")
 names(res) <- stringr::str_remove_all(names(res), "prob.pars.")
+names(res) <- stringr::str_remove_all(names(res), "result.res.")
 
-# if (!is.null(oldresdf)) {
-#   resold <- readRDS(oldresdf)
-#   if (names(resold) == names(res)) res <- rbind(res, resold)
-# }
-
-if (!is.null(oldresdf)) {
-  resold <- readRDS(oldresdf)
-  if (identical(names(resold), names(res))) {
-    res <- rbind(res, resold)
-  }
-}
+#if (!is.null(oldresdf)) {
+#  resold <- readRDS(oldresdf)
+#  if (identical(names(resold), names(res))) {
+#    res <- rbind(res, resold)
+#  }
+#}
 
 saveRDS(res, file = resname)
 

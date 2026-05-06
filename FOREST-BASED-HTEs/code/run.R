@@ -130,7 +130,7 @@ run <- function(
     if (causal_forest) {
       ret <- predict(cf,
         newdat = testxdf[grep("^X", colnames(testxdf))])$predictions
-      return(mean((tau[, "tfct"] - ret)^2))
+      mse <- mean((tau[, "tfct"] - ret)^2)
     } else {
       ### set-up linear model
       if (!prognostic_effect) {
@@ -142,7 +142,6 @@ run <- function(
       } else {
         m <- lm(y ~ trt, data = d)
       }
-    }
 
 
   ### fit forest and partition wrt to BOTH intercept and treatment effect
@@ -161,7 +160,8 @@ run <- function(
     ret <- c(cf)
   }
   mse <- mean((tau[, "tfct"] - ret)^2)
-  return(list(mse = mse,varimp = cfVarImp))
+  }
+  return(list(mse = mse, varimp = cfVarImp))
   
 }
 
@@ -369,8 +369,7 @@ fun.doubleml_hte <- function(instance,
 
   # MSE
   mse <- mean((tau_true - tau_hat)^2)
-
-  return(mse)
+  return(list(mse = mse, varimp = NULL))
 
   # return(list(
   #   tau_hat = tau_hat,
@@ -415,5 +414,5 @@ fun.doubleml_ate <- function(instance, learner = "mlr3::lrn('regr.ranger')", ...
 
   # Return MSE between estimated ATE and ground truth treatment effect
   mse <- mean((tau_true - tau_hat)^2)
-  return(mse)
+  return(list(mse = mse, varimp = NULL))
 }
