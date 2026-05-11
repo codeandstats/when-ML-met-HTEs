@@ -114,7 +114,7 @@ refactor <- function(df, method.nams) {
   lev <- levels(df$nd)
   levels(df$nd) <- sapply(strsplit(lev, ", "), function(x) paste(x[2], ", ", x[1]))
 
-  df <- df[, c("problem", "algorithm", "repl", "i", "nd", "ol", "seed", "result.res")]
+  df <- df[, c("problem", "algorithm", "repl", "i", "nd", "ol", "seed", "mse")]
 
   if (!HONESTY){
     df$algorithm <- factor(as.character(df$algorithm), levels = names(lookup))
@@ -124,7 +124,7 @@ refactor <- function(df, method.nams) {
   }
 
   df <- df[!is.na(df$algorithm),]
-  names(df)[names(df) == "result.res"] <- "value"
+  names(df)[names(df) == "mse"] <- "value"
   return(df)
 }
 
@@ -144,7 +144,7 @@ colornams <- lookup[methodnams]
 #  colornams <- lookup[names(cols)]
 #}
 
-Nna <- sum(is.na(res$result.res))
+Nna <- sum(is.na(res$mse))
 # res <- res %>%
 #   separate(i, into = c("p", "m", "t"), sep = "\\.")
 res <- refactor(res, method.nams =  methodnams)
